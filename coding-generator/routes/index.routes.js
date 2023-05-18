@@ -213,49 +213,61 @@ router.get("/play", isLoggedIn, async (req, res, next) => {
   try {
     // use a mongodb not in query written as $nin
 
-    const questionFromDb = await Question.find();
-
-
-    // const userEmail = req.session.userFromDatabase.email;
-    // const userId = await User.findOne({email:userEmail});
-    // const questionsUserHasAnswered = userId.answeredQuestions;
-
-    // if( questionsUserHasAnswered.include(questionFromDb)){
     
-      
-    // }else{
-    //   const randomIndex = Math.floor(Math.random() * questionFromDb.length);
 
-    // const randomQuestion = questionFromDb[randomIndex];
 
-    // const answerArr = [randomQuestion.correct, randomQuestion.false1, randomQuestion.false2, randomQuestion.false3];
-    // // console.log('answers',answerArr);
+    const userEmail = req.session.userFromDatabase.email;
+    const userId = await User.findOne({email:userEmail});
+    const questionsUserHasAnswered = userId.answeredQuestions;
 
-    // const answersRandomized = answerArr.sort(() => Math.random() - 0.5);
-    //  console.log(randomQuestion);
-    // // console.log(answersRandomized);
-    // res.render("questions/play", { randomQuestion, answersRandomized })
-    // }
+    const questionFromDb = []; 
+console.log('questions user has a',questionsUserHasAnswered)
 
-    //
-const randomIndex = Math.floor(Math.random() * questionFromDb.length);
+for (let i=0;questionsUserHasAnswered.length;i++){
+   let questionFromDbTemp = await Question.find({_id:{$nin:[questionsUserHasAnswered[i]]}});
+   questionFromDb.push(questionFromDbTemp);
+
+};
+console.log('questions user has a, after loop',questionsUserHasAnswered)
+    const randomIndex = Math.floor(Math.random() * questionFromDb.length);
 
     const randomQuestion = questionFromDb[randomIndex];
 
-    const answerArr = [randomQuestion.correct, randomQuestion.false1, randomQuestion.false2, randomQuestion.false3];
+    const answerArr = [
+      randomQuestion.correct, 
+      randomQuestion.false1, 
+      randomQuestion.false2, 
+      randomQuestion.false3
+    ];
+    
     // console.log('answers',answerArr);
 
     const answersRandomized = answerArr.sort(() => Math.random() - 0.5);
      console.log(randomQuestion);
     // console.log(answersRandomized);
-    res.render("questions/play", { randomQuestion, answersRandomized });
+    res.render("questions/play", { randomQuestion, answersRandomized })
+    
+
+    
+
+// const randomIndex = Math.floor(Math.random() * questionFromDb.length);
+
+//     const randomQuestion = questionFromDb[randomIndex];
+
+//     const answerArr = [randomQuestion.correct, randomQuestion.false1, randomQuestion.false2, randomQuestion.false3];
+//     // console.log('answers',answerArr);
+
+//     const answersRandomized = answerArr.sort(() => Math.random() - 0.5);
+//      console.log(randomQuestion);
+//     // console.log(answersRandomized);
+//     res.render("questions/play", { randomQuestion, answersRandomized });
 
 
     
   
    
   } catch (error) {
-    console.log("could not get description from db to /play", error);
+    console.log("could not get question from db to /play", error);
   }
 });
 
